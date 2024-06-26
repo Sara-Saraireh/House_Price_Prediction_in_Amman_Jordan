@@ -3,12 +3,8 @@ import joblib
 import pandas as pd
 import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-import numpy as np
 
-# Define a custom transformer to map floor descriptions to numerical values
+# Define custom transformers
 class FloorMapper(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.floor_mapping = {'Ground Floor': 0, 'Semi-Ground Floor': -1, 'Basement': -2, 'First Floor': 1,
@@ -21,27 +17,21 @@ class FloorMapper(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X['floor'].map(self.floor_mapping).values.reshape(-1, 1)
 
-# Define a custom transformer to calculate total rooms
 class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        # Assuming X is a DataFrame with columns 'number of rooms' and 'number of bathrooms'
-        total_rooms = X.iloc[:, 0] + X.iloc[:, 1]  # Access columns by position
+        total_rooms = X['number of rooms'] + X['number of bathrooms']
         return total_rooms.values.reshape(-1, 1)
-    
 
-# Load the preprocessing pipeline
-pipeline = joblib.load('preprocessing_pipeline.joblib')
-
-# Load the trained model
-with open('best_gb_model.pkl', 'rb') as file:
-    model = pickle.load(file)
+# Load the preprocessing pipeline and model
+pipeline = joblib.load('/mnt/data/preprocessing_pipeline.joblib')
+with open('/mnt/data/house_price_model.pkl', 'rb') as f:
+    model = pickle.load(f)
 
 # Define a function to preprocess input features
 def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
-    # Create a DataFrame with input features
     input_data = pd.DataFrame({
         'area': [area],
         'age': [age],
@@ -50,29 +40,17 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
         'number of bathrooms': [num_bathrooms]
     })
     
-    # Preprocess the input data using the pipeline
     preprocessed_data = pipeline.transform(input_data)
-    # Define the list of age categories
-    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
 
-    # Create new column names for the encoded features
+    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
     age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
-    preprocessed_data= pd.DataFrame(preprocessed_data, columns=['area'] + age_columns + ['floor', 'total_rooms'])
+    preprocessed_data = pd.DataFrame(preprocessed_data, columns=['area'] + age_columns + ['floor', 'total_rooms'])
     return preprocessed_data
 
 def predict_price(area, age, floor, num_rooms, num_bathrooms):
-    # Preprocess the input features
     preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
-    
-
-
-    # Predict the house price using the loaded model
-    predicted_price = model.predict(preprocessed_features)[0]  # Pass the array directly
+    predicted_price = model.predict(preprocessed_features)[0]
     return predicted_price
-
-
-
-
 
 # UI elements
 st.title('Real Estate House Price Prediction')
@@ -88,4 +66,3 @@ num_bathrooms = st.number_input('Select number of bathrooms', min_value=1, max_v
 if st.button('Predict Price'):
     predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
     st.success(f'Predicted Price: ${predicted_price:,.2f}')
-
