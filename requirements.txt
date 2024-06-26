@@ -4,6 +4,3 @@ joblib
 matplotlib
 streamlit
 scikit-learn
-sklearn.base
-sklearn.ensemble
-sklearn.model_selection
