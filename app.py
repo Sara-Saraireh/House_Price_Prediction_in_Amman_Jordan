@@ -4,8 +4,7 @@ import pandas as pd
 import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 
-    # Load the trained model
-model = load_model('house_price_model.pkl')
+
 
 # Define a custom transformer to map floor descriptions to numerical values
 class FloorMapper(BaseEstimator, TransformerMixin):
