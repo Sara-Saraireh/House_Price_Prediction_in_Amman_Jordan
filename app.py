@@ -33,10 +33,10 @@ class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
     
 
 # Load the preprocessing pipeline
-pipeline = joblib.load('/preprocessing_pipeline.joblib')
+pipeline = joblib.load('preprocessing_pipeline.joblib')
 
 # Load the trained model
-with open('/best_gb_model.pkl', 'rb') as file:
+with open('best_gb_model.pkl', 'rb') as file:
     model = pickle.load(file)
 
 # Define a function to preprocess input features
