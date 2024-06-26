@@ -5,6 +5,8 @@ import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Load datasets
 df10 = pd.read_csv('real_estate_app/df10.csv')
@@ -23,7 +25,7 @@ best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
                                           min_samples_split=3,
                                           n_estimators=300)
 
-best_gb_model= best_gb_model.fit(X_train, y_train)
+best_gb_model = best_gb_model.fit(X_train, y_train)
 
 # Define custom transformers
 class FloorMapper(BaseEstimator, TransformerMixin):
@@ -70,8 +72,6 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
 
     return df_pro
 
-
-
 # Function to make predictions
 def predict_price(area, age, floor, num_rooms, num_bathrooms):
     preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
@@ -81,17 +81,25 @@ def predict_price(area, age, floor, num_rooms, num_bathrooms):
 def run_ui():
     st.title('Real Estate House Price Prediction')
 
-    area = st.number_input('Enter area in square feet', min_value=0)
-    age = st.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
-    floor = st.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
-                                          'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
-                                          'Last Floor With Roof'])
-    num_rooms = st.number_input('Select number of rooms', min_value=1, max_value=6, value=1)
-    num_bathrooms = st.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
+    st.sidebar.header('Input Features')
+    area = st.sidebar.number_input('Enter area in square feet', min_value=0)
+    age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
+    floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
+                                                  'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
+                                                  'Last Floor With Roof'])
+    num_rooms = st.sidebar.number_input('Select number of rooms', min_value=1, max_value=6, value=1)
+    num_bathrooms = st.sidebar.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
 
-    if st.button('Predict Price'):
+    if st.sidebar.button('Predict Price'):
         predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
         st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
+
+        # Visualization
+        fig, ax = plt.subplots()
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax)
+        ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
+        ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
+        st.pyplot(fig)
 
 if __name__ == "__main__":
     pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
