@@ -12,6 +12,10 @@ import seaborn as sns
 df10 = pd.read_csv('real_estate_app/df10.csv')
 df9 = pd.read_csv('real_estate_app/df9.csv')
 
+# Print column names for debugging
+st.write("df10 columns:", df10.columns)
+st.write("df9 columns:", df9.columns)
+
 # Step 1: Split the Data into Training and Testing Sets
 X = df10.copy()
 y = df9['Price']  # Target variable
@@ -105,9 +109,9 @@ def run_ui():
         st.pyplot(fig1)
 
         # Visualization 2: Comparison with other apartments
-        df_similar_area = df9[df9['area'] == area]
+        df_similar_area = df10[df10['area_scaled'] == area]
         df_similar_area['Predicted Price'] = df_similar_area.apply(
-            lambda row: predict_price(row['area'], row['age'], row['floor'], row['number of rooms'], row['number of bathrooms'])[0], axis=1
+            lambda row: predict_price(row['area_scaled'], row['age'], row['floor'], row['number of rooms'], row['number of bathrooms'])[0], axis=1
         )
 
         fig2, ax2 = plt.subplots()
