@@ -16,41 +16,9 @@ df9 = pd.read_csv('real_estate_app/df9.csv')
 st.write("df10 columns:", df10.columns)
 st.write("df9 columns:", df9.columns)
 
-# Step 1: Split the Data into Training and Testing Sets
-X = df10.copy()
-y = df9['Price']  # Target variable
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
-best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
-                                          max_depth=3,
-                                          min_samples_leaf=1,
-                                          min_samples_split=3,
-                                          n_estimators=300)
-
-best_gb_model = best_gb_model.fit(X_train, y_train)
-
-# Define custom transformers
-class FloorMapper(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        self.floor_mapping = {'Ground Floor': 0, 'Semi-Ground Floor': -1, 'Basement': -2, 'First Floor': 1,
-                              'Second Floor': 2, 'Third Floor': 3, 'Fourth Floor': 4, 'Fifth Floor': 5,
-                              'Last Floor With Roof': 6}
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return X['floor'].map(self.floor_mapping).values.reshape(-1, 1)
-
-class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        total_rooms = X['number of rooms'] + X['number of bathrooms']
-        return total_rooms.values.reshape(-1, 1)
+# Load the preprocessing pipeline and model
+pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
+best_gb_model = joblib.load('real_estate_app/best_gb_model.pkl')
 
 # Function to preprocess input data
 def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
@@ -108,24 +76,27 @@ def run_ui():
         ax1.set_ylabel('Frequency')
         st.pyplot(fig1)
 
-        # Visualization 2: Comparison with other apartments
-        preprocessed_df10 = pipeline.transform(df10)
-        df10_preprocessed = pd.DataFrame(preprocessed_df10, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
-        df10_preprocessed['Price'] = df9['Price']  # Assuming df9 has the target 'Price' column
+        # Ensure that df10 has all the required columns for transformation
+        missing_cols = set(pipeline.named_transformers_['preprocessor'].feature_names_in_) - set(df10.columns)
+        if missing_cols:
+            st.error(f"The following columns are missing in df10: {missing_cols}")
+        else:
+            preprocessed_df10 = pipeline.transform(df10)
+            df10_preprocessed = pd.DataFrame(preprocessed_df10, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
+            df10_preprocessed['Price'] = df9['Price']  # Assuming df9 has the target 'Price' column
 
-        df_similar_area = df10_preprocessed[df10_preprocessed['area_scaled'] == preprocessed_features.iloc[0]['area_scaled']]
-        df_similar_area['Predicted Price'] = df_similar_area.apply(
-            lambda row: predict_price(row.values.reshape(1, -1))[0], axis=1
-        )
+            df_similar_area = df10_preprocessed[df10_preprocessed['area_scaled'] == preprocessed_features.iloc[0]['area_scaled']]
+            df_similar_area['Predicted Price'] = df_similar_area.apply(
+                lambda row: predict_price(row.values.reshape(1, -1))[0], axis=1
+            )
 
-        fig2, ax2 = plt.subplots()
-        sns.scatterplot(data=df_similar_area, x='total_rooms', y='Predicted Price', hue='floor_numeric', palette='viridis', ax=ax2)
-        ax2.set_title(f'Predicted Prices for Apartments with {area} sqft Area')
-        ax2.set_xlabel('Number of Rooms')
-        ax2.set_ylabel('Predicted Price')
-        st.pyplot(fig2)
+            # Visualization 2: Comparison with other apartments
+            fig2, ax2 = plt.subplots()
+            sns.scatterplot(data=df_similar_area, x='total_rooms', y='Predicted Price', hue='floor_numeric', palette='viridis', ax=ax2)
+            ax2.set_title(f'Predicted Prices for Apartments with {area} sqft Area')
+            ax2.set_xlabel('Number of Rooms')
+            ax2.set_ylabel('Predicted Price')
+            st.pyplot(fig2)
 
 if __name__ == "__main__":
-    pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
-    model = best_gb_model
     run_ui()
