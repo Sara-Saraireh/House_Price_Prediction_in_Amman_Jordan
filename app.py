@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
+import matplotlib.pyplot as plt
 
 # Define custom transformers
 class FloorMapper(BaseEstimator, TransformerMixin):
@@ -26,8 +27,8 @@ class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
         return total_rooms.values.reshape(-1, 1)
 
 # Load the preprocessing pipeline and model
-pipeline = joblib.load('preprocessing_pipeline.joblib')
-with open('house_price_model.pkl', 'rb') as f:
+pipeline = joblib.load('/mnt/data/preprocessing_pipeline.joblib')
+with open('/mnt/data/house_price_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 # Define a function to preprocess input features
@@ -52,17 +53,34 @@ def predict_price(area, age, floor, num_rooms, num_bathrooms):
     predicted_price = model.predict(preprocessed_features)[0]
     return predicted_price
 
-# UI elements
-st.title('Real Estate House Price Prediction')
+# Set the theme
+st.set_page_config(page_title='Real Estate House Price Prediction', layout='wide')
 
-area = st.number_input('Enter area in square feet', min_value=0)
-age = st.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
-floor = st.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
-                                      'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
-                                      'Last Floor With Roof'])
-num_rooms = st.number_input('Select number of rooms', min_value=1, max_value=6, value=1)
-num_bathrooms = st.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
+# Sidebar UI elements
+st.sidebar.title('House Price Prediction')
+st.sidebar.write("Enter the details of the house to get the price prediction")
 
-if st.button('Predict Price'):
+area = st.sidebar.number_input('Enter area in square feet', min_value=0)
+age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
+floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
+                                              'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
+                                              'Last Floor With Roof'])
+num_rooms = st.sidebar.number_input('Select number of rooms', min_value=1, max_value=6, value=1)
+num_bathrooms = st.sidebar.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
+
+if st.sidebar.button('Predict Price'):
     predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
-    st.success(f'Predicted Price: ${predicted_price:,.2f}')
+    st.sidebar.success(f'Predicted Price: ${predicted_price:,.2f}')
+
+    # Visualization
+    st.write('### House Price Prediction Visualization')
+    fig, ax = plt.subplots()
+    categories = ['Area', 'Age', 'Floor', 'Total Rooms']
+    values = [area, age, floor, num_rooms + num_bathrooms]
+    ax.bar(categories, values, color=['blue', 'orange', 'green', 'red'])
+    ax.set_ylabel('Value')
+    ax.set_title('House Features')
+    st.pyplot(fig)
+else:
+    st.sidebar.write("Click the button to predict the house price")
+
