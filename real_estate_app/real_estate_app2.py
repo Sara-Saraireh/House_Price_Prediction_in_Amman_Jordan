@@ -1,7 +1,6 @@
 import streamlit as st
 import joblib
 import pandas as pd
-import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
@@ -62,7 +61,7 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     processed_data = pipeline.transform(input_data)
 
     # Define the list of age categories
-    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+    age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']
 
     # Create new column names for the encoded features
     age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
@@ -82,7 +81,9 @@ def run_ui():
     st.title('Real Estate House Price Prediction')
 
     st.sidebar.header('Input Features')
-    area = st.sidebar.number_input('Enter area in square feet', min_value=0)
+    min_area = int(df10['area'].min())
+    max_area = int(df10['area'].max())
+    area = st.sidebar.slider('Enter area in square feet', min_value=min_area, max_value=max_area, value=min_area)
     age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
     floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
                                                   'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
