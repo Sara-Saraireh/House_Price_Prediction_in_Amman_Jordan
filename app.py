@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 
 # Load the preprocessing pipeline and model
-preprocessing_pipeline = joblib.load('https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/484dad6382a52ec584c20197278ad1364a849694/preprocessing_pipeline.joblib')
+preprocessing_pipeline = joblib.load('preprocessing_pipeline.joblib')
 with open('/mnt/data/house_price_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
