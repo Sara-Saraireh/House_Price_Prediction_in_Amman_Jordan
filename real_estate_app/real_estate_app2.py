@@ -1,6 +1,7 @@
 import streamlit as st
 import joblib
 import pandas as pd
+import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
@@ -61,7 +62,7 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     processed_data = pipeline.transform(input_data)
 
     # Define the list of age categories
-    age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']
+    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
 
     # Create new column names for the encoded features
     age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
@@ -81,7 +82,7 @@ def run_ui():
     st.title('Real Estate House Price Prediction')
 
     st.sidebar.header('Input Features')
-    area = st.sidebar.slider('Enter area in square feet', min_value=50, max_value=500, value=50)
+    area = st.sidebar.number_input('Enter area in square feet', min_value=0)
     age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
     floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
                                                   'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
@@ -104,13 +105,14 @@ def run_ui():
         plt.tight_layout()
         st.pyplot(fig)
 
-        # Feature Importances
+         # Feature Importances
         st.subheader('Feature Importances')
         age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
         age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
         features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
         feature_importances = best_gb_model.feature_importances_
         importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
+
 
         # Plotting with enhancements
         fig, ax = plt.subplots(figsize=(10, 6))
