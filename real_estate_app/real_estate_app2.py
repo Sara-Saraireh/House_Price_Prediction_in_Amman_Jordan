@@ -62,7 +62,7 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     processed_data = pipeline.transform(input_data)
 
     # Define the list of age categories
-    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+    age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']  # Sorted properly
 
     # Create new column names for the encoded features
     age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
@@ -96,7 +96,7 @@ def run_ui():
 
         # Visualization
         fig, ax = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, palette='viridis')
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, color=sns.color_palette('viridis')[2])
         ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
         ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
         ax.set_title('Price Distribution with Predicted Price')
@@ -107,7 +107,7 @@ def run_ui():
 
         # Feature Importances
         st.subheader('Feature Importances')
-        age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+        age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']  # Sorted properly
         age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
         features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
         feature_importances = best_gb_model.feature_importances_
@@ -126,7 +126,7 @@ def run_ui():
         st.subheader('Predicted vs Actual Prices')
         y_pred = best_gb_model.predict(X_test)
         fig, ax = plt.subplots()
-        sns.scatterplot(x=y_test, y=y_pred, ax=ax, palette='viridis')
+        sns.scatterplot(x=y_test, y=y_pred, ax=ax, color=sns.color_palette('viridis')[2])
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
         ax.set_title('Predicted vs Actual Prices')
         ax.set_xlabel('Actual Price')
