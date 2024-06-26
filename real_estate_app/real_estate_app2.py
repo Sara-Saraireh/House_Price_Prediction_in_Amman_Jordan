@@ -77,8 +77,7 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     return df_pro
 
 # Function to make predictions
-def predict_price(area, age, floor, num_rooms, num_bathrooms):
-    preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
+def predict_price(preprocessed_features):
     return best_gb_model.predict(preprocessed_features)
 
 # Function to display the Streamlit UI
@@ -95,7 +94,8 @@ def run_ui():
     num_bathrooms = st.sidebar.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
 
     if st.sidebar.button('Predict Price'):
-        predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
+        preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
+        predicted_price = predict_price(preprocessed_features)
         st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
 
         # Visualization 1: Price Distribution
@@ -109,13 +109,17 @@ def run_ui():
         st.pyplot(fig1)
 
         # Visualization 2: Comparison with other apartments
-        df_similar_area = df10[df10['area_scaled'] == area]
+        preprocessed_df10 = pipeline.transform(df10)
+        df10_preprocessed = pd.DataFrame(preprocessed_df10, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
+        df10_preprocessed['Price'] = df9['Price']  # Assuming df9 has the target 'Price' column
+
+        df_similar_area = df10_preprocessed[df10_preprocessed['area_scaled'] == preprocessed_features.iloc[0]['area_scaled']]
         df_similar_area['Predicted Price'] = df_similar_area.apply(
-            lambda row: predict_price(row['area_scaled'], row['age'], row['floor'], row['number of rooms'], row['number of bathrooms'])[0], axis=1
+            lambda row: predict_price(row.values.reshape(1, -1))[0], axis=1
         )
 
         fig2, ax2 = plt.subplots()
-        sns.scatterplot(data=df_similar_area, x='number of rooms', y='Predicted Price', hue='floor', palette='viridis', ax=ax2)
+        sns.scatterplot(data=df_similar_area, x='total_rooms', y='Predicted Price', hue='floor_numeric', palette='viridis', ax=ax2)
         ax2.set_title(f'Predicted Prices for Apartments with {area} sqft Area')
         ax2.set_xlabel('Number of Rooms')
         ax2.set_ylabel('Predicted Price')
