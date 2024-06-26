@@ -80,6 +80,11 @@ def run_ui():
         st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
 
 if __name__ == "__main__":
+    # Load the preprocessing pipeline
     pipeline = joblib.load('preprocessing_pipeline.joblib')
+    
+    # Load the trained model
     model = load_model('best_gb_model.pkl')
+    
+    # Run the UI
     run_ui()
