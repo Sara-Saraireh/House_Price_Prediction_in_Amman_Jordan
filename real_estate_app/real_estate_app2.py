@@ -105,13 +105,14 @@ def run_ui():
         plt.tight_layout()
         st.pyplot(fig)
 
-        # Feature Importances
-        st.subheader('Feature Importances')
-        age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']  # Sorted properly
-        age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
-        features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
-        feature_importances = best_gb_model.feature_importances_
-        importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
+          # Plotting with enhancements
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x='Importance', y='Feature', data=importance_df, palette='viridis', ax=ax)
+        ax.set_title('Feature Importances in House Price Prediction Model')
+        ax.set_xlabel('Relative Importance')
+        ax.set_ylabel('Feature')
+        plt.tight_layout()
+        st.pyplot(fig)
 
         # Plotting with enhancements
         fig, ax = plt.subplots(figsize=(10, 6))
