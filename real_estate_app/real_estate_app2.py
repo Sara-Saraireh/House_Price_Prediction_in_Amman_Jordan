@@ -62,7 +62,7 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     processed_data = pipeline.transform(input_data)
 
     # Define the list of age categories
-    age_categories = ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40']  # Sorted properly
+    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
 
     # Create new column names for the encoded features
     age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
