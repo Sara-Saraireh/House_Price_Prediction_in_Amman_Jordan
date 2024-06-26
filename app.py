@@ -85,7 +85,7 @@ if __name__ == "__main__":
     pipeline = joblib.load('preprocessing_pipeline.joblib')
     
     # Load the trained model
-    model = load_model('best_gb_model.pkl')
+    model = load_model('house_price_model.pkl')
     
     # Run the UI
     run_ui()
