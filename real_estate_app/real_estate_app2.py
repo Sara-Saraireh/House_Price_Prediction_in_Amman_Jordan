@@ -96,7 +96,7 @@ def run_ui():
 
         # Visualization
         fig, ax = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, color=sns.color_palette('viridis')[2])
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, color=sns.color_palette('viridis')[5])
         ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
         ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
         ax.set_title('Price Distribution with Predicted Price')
