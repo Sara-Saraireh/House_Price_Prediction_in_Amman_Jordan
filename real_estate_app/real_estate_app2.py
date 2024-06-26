@@ -5,9 +5,10 @@ import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
-df10= pd.read_csv('real_estate_app/df10.csv')
-df9= pd.read_csv('real_estate_app/df9.csv')
 
+# Load datasets
+df10 = pd.read_csv('real_estate_app/df10.csv')
+df9 = pd.read_csv('real_estate_app/df9.csv')
 
 # Step 1: Split the Data into Training and Testing Sets
 X = df10.copy()
@@ -15,7 +16,6 @@ y = df9['Price']  # Target variable
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Assuming X_train and y_train are your training features and labels
 # Train the model
 best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
                                           max_depth=3,
@@ -25,8 +25,7 @@ best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
 
 best_gb_model.fit(X_train, y_train)
 
-
-# Define a custom transformer to map floor descriptions to numerical values
+# Define custom transformers
 class FloorMapper(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.floor_mapping = {'Ground Floor': 0, 'Semi-Ground Floor': -1, 'Basement': -2, 'First Floor': 1,
@@ -39,14 +38,12 @@ class FloorMapper(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X['floor'].map(self.floor_mapping).values.reshape(-1, 1)
 
-# Define a custom transformer to calculate total rooms
 class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        # Assuming X is a DataFrame with columns 'number of rooms' and 'number of bathrooms'
-        total_rooms = X.iloc[:, 0] + X.iloc[:, 1]  # Access columns by position
+        total_rooms = X['number of rooms'] + X['number of bathrooms']
         return total_rooms.values.reshape(-1, 1)
 
 # Function to preprocess input data
@@ -71,7 +68,6 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     # Convert the NumPy array to a DataFrame
     df_pro = pd.DataFrame(processed_data, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
 
-
     return df_pro
 
 # Function to load the trained model
@@ -81,7 +77,6 @@ def load_model(model_path):
 # Function to make predictions
 def predict_price(area, age, floor, num_rooms, num_bathrooms):
     preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
-
     return best_gb_model.predict(preprocessed_features)
 
 # Function to display the Streamlit UI
@@ -97,9 +92,8 @@ def run_ui():
     num_bathrooms = st.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
 
     if st.button('Predict Price'):
-        processed_data = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
-        predict_price = model.predict(processed_data)
-        st.success(f'Predicted Price: ${predict_price[0]:,.2f}')
+        predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
+        st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
 
 if __name__ == "__main__":
     pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
