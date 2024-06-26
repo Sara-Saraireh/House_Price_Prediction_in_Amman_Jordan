@@ -94,12 +94,28 @@ def run_ui():
         predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
         st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
 
-        # Visualization
-        fig, ax = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax)
-        ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
-        ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
-        st.pyplot(fig)
+        # Visualization 1: Price Distribution
+        fig1, ax1 = plt.subplots()
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax1)
+        ax1.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
+        ax1.text(predicted_price[0], ax1.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
+        ax1.set_title('Distribution of Actual Prices with Predicted Price')
+        ax1.set_xlabel('Price')
+        ax1.set_ylabel('Frequency')
+        st.pyplot(fig1)
+
+        # Visualization 2: Comparison with other apartments
+        df_similar_area = df10[df10['area'] == area]
+        df_similar_area['Predicted Price'] = df_similar_area.apply(
+            lambda row: predict_price(row['area'], row['age'], row['floor'], row['number of rooms'], row['number of bathrooms'])[0], axis=1
+        )
+
+        fig2, ax2 = plt.subplots()
+        sns.scatterplot(data=df_similar_area, x='number of rooms', y='Predicted Price', hue='floor', palette='viridis', ax=ax2)
+        ax2.set_title(f'Predicted Prices for Apartments with {area} sqft Area')
+        ax2.set_xlabel('Number of Rooms')
+        ax2.set_ylabel('Predicted Price')
+        st.pyplot(fig2)
 
 if __name__ == "__main__":
     pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
