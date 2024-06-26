@@ -27,14 +27,14 @@ class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
 
 # Load the preprocessing pipeline and model
 try:
-    pipeline = joblib.load('/mnt/data/preprocessing_pipeline.joblib')
+    pipeline = joblib.load('preprocessing_pipeline.joblib')
 except FileNotFoundError:
     st.error("Preprocessing pipeline file not found.")
 except Exception as e:
     st.error(f"An error occurred while loading the preprocessing pipeline: {e}")
 
 try:
-    model = joblib.load('/mnt/data/house_price_model.pkl')
+    model = joblib.load('house_price_model.pkl')
 except FileNotFoundError:
     st.error("Model file not found.")
 except Exception as e:
