@@ -27,9 +27,20 @@ class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
         return total_rooms.values.reshape(-1, 1)
 
 # Load the preprocessing pipeline and model
-pipeline = joblib.load('preprocessing_pipeline.joblib')
-with open('house_price_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+try:
+    pipeline = joblib.load('preprocessing_pipeline.joblib')
+except FileNotFoundError:
+    st.error("Preprocessing pipeline file not found.")
+except Exception as e:
+    st.error(f"An error occurred while loading the preprocessing pipeline: {e}")
+
+try:
+    with open('house_price_model.pkl', 'rb') as f:
+        model = pickle.load(f)
+except FileNotFoundError:
+    st.error("Model file not found.")
+except Exception as e:
+    st.error(f"An error occurred while loading the model: {e}")
 
 # Define a function to preprocess input features
 def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
@@ -69,18 +80,20 @@ num_rooms = st.sidebar.number_input('Select number of rooms', min_value=1, max_v
 num_bathrooms = st.sidebar.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
 
 if st.sidebar.button('Predict Price'):
-    predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
-    st.sidebar.success(f'Predicted Price: ${predicted_price:,.2f}')
+    try:
+        predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
+        st.sidebar.success(f'Predicted Price: ${predicted_price:,.2f}')
 
-    # Visualization
-    st.write('### House Price Prediction Visualization')
-    fig, ax = plt.subplots()
-    categories = ['Area', 'Age', 'Floor', 'Total Rooms']
-    values = [area, age, floor, num_rooms + num_bathrooms]
-    ax.bar(categories, values, color=['blue', 'orange', 'green', 'red'])
-    ax.set_ylabel('Value')
-    ax.set_title('House Features')
-    st.pyplot(fig)
+        # Visualization
+        st.write('### House Price Prediction Visualization')
+        fig, ax = plt.subplots()
+        categories = ['Area', 'Age', 'Floor', 'Total Rooms']
+        values = [area, age, floor, num_rooms + num_bathrooms]
+        ax.bar(categories, values, color=['blue', 'orange', 'green', 'red'])
+        ax.set_ylabel('Value')
+        ax.set_title('House Features')
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
 else:
     st.sidebar.write("Click the button to predict the house price")
-
