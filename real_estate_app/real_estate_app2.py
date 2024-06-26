@@ -103,8 +103,10 @@ def run_ui():
         
         # Feature Importances
         st.subheader('Feature Importances')
-        feature_importances = best_gb_model.feature_importances_
+        age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+        age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
         features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
+        feature_importances = best_gb_model.feature_importances_
         importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
         fig, ax = plt.subplots()
         sns.barplot(x='Importance', y='Feature', data=importance_df, ax=ax)
