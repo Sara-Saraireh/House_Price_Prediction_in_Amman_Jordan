@@ -105,7 +105,7 @@ def run_ui():
         st.pyplot(fig1)
 
         # Visualization 2: Comparison with other apartments
-        df_similar_area = df10[df10['area'] == area]
+        df_similar_area = df9[df9['area'] == area]
         df_similar_area['Predicted Price'] = df_similar_area.apply(
             lambda row: predict_price(row['area'], row['age'], row['floor'], row['number of rooms'], row['number of bathrooms'])[0], axis=1
         )
