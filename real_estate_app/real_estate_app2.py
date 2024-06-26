@@ -5,7 +5,7 @@ import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
-df10= pd.read_csv('/real_estate_app/df10.csv')
+df10= pd.read_csv('real_estate_app/df10.csv')
 df9= pd.read_csv('/real_estate_app/df9.csv')
 
 
