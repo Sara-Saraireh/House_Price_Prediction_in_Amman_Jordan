@@ -96,7 +96,7 @@ def run_ui():
 
         # Visualization
         fig, ax = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, color='skyblue')
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, palette='viridis')
         ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
         ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
         ax.set_title('Price Distribution with Predicted Price')
@@ -115,7 +115,7 @@ def run_ui():
 
         # Plotting with enhancements
         fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x='Importance', y='Feature', data=importance_df, color='skyblue', ax=ax)
+        sns.barplot(x='Importance', y='Feature', data=importance_df, palette='viridis', ax=ax)
         ax.set_title('Feature Importances in House Price Prediction Model')
         ax.set_xlabel('Relative Importance')
         ax.set_ylabel('Feature')
@@ -126,7 +126,7 @@ def run_ui():
         st.subheader('Predicted vs Actual Prices')
         y_pred = best_gb_model.predict(X_test)
         fig, ax = plt.subplots()
-        sns.scatterplot(x=y_test, y=y_pred, ax=ax, color='skyblue')
+        sns.scatterplot(x=y_test, y=y_pred, ax=ax, palette='viridis')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
         ax.set_title('Predicted vs Actual Prices')
         ax.set_xlabel('Actual Price')
