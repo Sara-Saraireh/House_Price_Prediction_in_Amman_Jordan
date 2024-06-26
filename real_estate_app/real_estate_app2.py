@@ -81,8 +81,8 @@ def run_ui():
     st.title('Real Estate House Price Prediction')
 
     st.sidebar.header('Input Features')
-    min_area = int(df10['area'].min(50))
-    max_area = int(df10['area'].max(500))
+    min_area = int(df10['area'].min())
+    max_area = int(df10['area'].max())
     area = st.sidebar.slider('Enter area in square feet', min_value=min_area, max_value=max_area, value=min_area)
     age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
     floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
