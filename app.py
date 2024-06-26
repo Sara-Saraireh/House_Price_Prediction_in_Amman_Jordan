@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 
 # Load the preprocessing pipeline and model
-preprocessing_pipeline = joblib.load('/mnt/data/preprocessing_pipeline.joblib')
+preprocessing_pipeline = joblib.load('preprocessing_pipeline.joblib')
 with open('/mnt/data/house_price_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
