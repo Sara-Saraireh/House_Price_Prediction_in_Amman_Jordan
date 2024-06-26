@@ -1,36 +1,84 @@
 import streamlit as st
+import joblib
 import pandas as pd
-import pickle
 
-# Load the trained model
-model = pickle.load(open('house_price_model.pkl', 'rb'))
+# Define a custom transformer to map floor descriptions to numerical values
+class FloorMapper(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.floor_mapping = {
+            'Ground Floor': 0, 'Semi-Ground Floor': -1, 'Basement': -2,
+            'First Floor': 1, 'Second Floor': 2, 'Third Floor': 3,
+            'Fourth Floor': 4, 'Fifth Floor': 5, 'Last Floor With Roof': 6
+        }
 
-# Title
-st.title('House Price Prediction in Amman, Jordan')
+    def fit(self, X, y=None):
+        return self
 
-# Input features
-st.sidebar.header('Input Features')
-def user_input_features():
-    rooms = st.sidebar.slider('Number of Rooms', 1, 10, 1)
-    bathrooms = st.sidebar.slider('Number of Bathrooms', 1, 5, 1)
-    area = st.sidebar.slider('Area (sq meters)', 50, 500, 50)
-    floor = st.sidebar.slider('Floor', 0, 10, 0)
-    age = st.sidebar.slider('Age of the Apartment', 0, 30, 0)
-    data = {'rooms': rooms, 'bathrooms': bathrooms, 'area': area, 'floor': floor, 'age': age}
-    features = pd.DataFrame(data, index=[0])
-    return features
+    def transform(self, X):
+        return X['floor'].map(self.floor_mapping).values.reshape(-1, 1)
 
-input_df = user_input_features()
+# Define a custom transformer to calculate total rooms
+class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
 
-# Display input features
-st.subheader('Input Features')
-st.write(input_df)
+    def transform(self, X):
+        total_rooms = X.iloc[:, 0] + X.iloc[:, 1]
+        return total_rooms.values.reshape(-1, 1)
 
-# Make predictions
-prediction = model.predict(input_df)
+# Function to preprocess input data
+def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
+    input_data = pd.DataFrame({
+        'area': [area],
+        'age': [age],
+        'floor': [floor],
+        'number of rooms': [num_rooms],
+        'number of bathrooms': [num_bathrooms]
+    })
 
-# Display prediction
-st.subheader('Predicted House Price')
-st.write(f"The predicted price is {prediction[0]:.2f} JD")
+    # Apply the preprocessing pipeline to the input data
+    processed_data = pipeline.transform(input_data)
 
-# To run the app, use the command: streamlit run app.py
+    # Define the list of age categories
+    age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+
+    # Create new column names for the encoded features
+    age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
+
+    # Convert the NumPy array to a DataFrame
+    df_pro = pd.DataFrame(processed_data, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
+
+    return df_pro
+
+# Function to load the trained model
+def load_model(model_path):
+    return joblib.load(model_path)
+
+# Function to make predictions
+def predict_price(area, age, floor, num_rooms, num_bathrooms):
+    preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
+    return model.predict(preprocessed_features)
+
+# Function to display the Streamlit UI
+def run_ui():
+    st.title('Real Estate House Price Prediction')
+
+    area = st.number_input('Enter area in square feet', min_value=0)
+    age = st.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
+    floor = st.selectbox('Select floor', [
+        'Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
+        'Basement', 'Second Floor', 'Fifth Floor', 'Semi-Ground Floor',
+        'Last Floor With Roof'
+    ])
+    num_rooms = st.number_input('Select number of rooms', min_value=1, max_value=6, value=1)
+    num_bathrooms = st.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
+
+    if st.button('Predict Price'):
+        processed_data = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
+        predicted_price = model.predict(processed_data)
+        st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
+
+if __name__ == "__main__":
+    pipeline = joblib.load('preprocessing_pipeline.joblib')
+    model = load_model('best_gb_model.pkl')
+    run_ui()
