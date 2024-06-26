@@ -1,6 +1,0 @@
-pandas
-openpyxl
-joblib
-matplotlib
-streamlit
-scikit-learn
