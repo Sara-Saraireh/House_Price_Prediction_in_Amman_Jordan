@@ -44,8 +44,12 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
         'number of bathrooms': [num_bathrooms]
     })
 
+    st.write("Input Data:", input_data)  # Debugging line
+
     # Apply the preprocessing pipeline to the input data
     processed_data = pipeline.transform(input_data)
+
+    st.write("Processed Data:", processed_data)  # Debugging line
 
     # Define the list of age categories
     age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
@@ -55,6 +59,8 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
 
     # Convert the NumPy array to a DataFrame
     df_pro = pd.DataFrame(processed_data, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
+
+    st.write("DataFrame with processed data:", df_pro)  # Debugging line
 
     return df_pro
 
