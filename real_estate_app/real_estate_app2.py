@@ -105,14 +105,14 @@ def run_ui():
         plt.tight_layout()
         st.pyplot(fig)
 
-          # Plotting with enhancements
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x='Importance', y='Feature', data=importance_df, palette='viridis', ax=ax)
-        ax.set_title('Feature Importances in House Price Prediction Model')
-        ax.set_xlabel('Relative Importance')
-        ax.set_ylabel('Feature')
-        plt.tight_layout()
-        st.pyplot(fig)
+         # Feature Importances
+        st.subheader('Feature Importances')
+        age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
+        age_columns = ['age_' + category.replace(' ', '_') for category in age_categories]
+        features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
+        feature_importances = best_gb_model.feature_importances_
+        importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
+
 
         # Plotting with enhancements
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -127,7 +127,7 @@ def run_ui():
         st.subheader('Predicted vs Actual Prices')
         y_pred = best_gb_model.predict(X_test)
         fig, ax = plt.subplots()
-        sns.scatterplot(x=y_test, y=y_pred, ax=ax, color=sns.color_palette('viridis')[2])
+        sns.scatterplot(x=y_test, y=y_pred, ax=ax, color=sns.color_palette('viridis')[1])
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
         ax.set_title('Predicted vs Actual Prices')
         ax.set_xlabel('Actual Price')
