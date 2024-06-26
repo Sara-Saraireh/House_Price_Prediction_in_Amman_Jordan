@@ -12,13 +12,41 @@ import seaborn as sns
 df10 = pd.read_csv('real_estate_app/df10.csv')
 df9 = pd.read_csv('real_estate_app/df9.csv')
 
-# Print column names for debugging
-st.write("df10 columns:", df10.columns)
-st.write("df9 columns:", df9.columns)
+# Step 1: Split the Data into Training and Testing Sets
+X = df10.copy()
+y = df9['Price']  # Target variable
 
-# Load the preprocessing pipeline and model
-pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
-best_gb_model = joblib.load('real_estate_app/best_gb_model.pkl')
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
+                                          max_depth=3,
+                                          min_samples_leaf=1,
+                                          min_samples_split=3,
+                                          n_estimators=300)
+
+best_gb_model = best_gb_model.fit(X_train, y_train)
+
+# Define custom transformers
+class FloorMapper(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.floor_mapping = {'Ground Floor': 0, 'Semi-Ground Floor': -1, 'Basement': -2, 'First Floor': 1,
+                              'Second Floor': 2, 'Third Floor': 3, 'Fourth Floor': 4, 'Fifth Floor': 5,
+                              'Last Floor With Roof': 6}
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X['floor'].map(self.floor_mapping).values.reshape(-1, 1)
+
+class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        total_rooms = X['number of rooms'] + X['number of bathrooms']
+        return total_rooms.values.reshape(-1, 1)
 
 # Function to preprocess input data
 def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
@@ -45,7 +73,8 @@ def preprocess_input(area, age, floor, num_rooms, num_bathrooms):
     return df_pro
 
 # Function to make predictions
-def predict_price(preprocessed_features):
+def predict_price(area, age, floor, num_rooms, num_bathrooms):
+    preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
     return best_gb_model.predict(preprocessed_features)
 
 # Function to display the Streamlit UI
@@ -62,41 +91,36 @@ def run_ui():
     num_bathrooms = st.sidebar.number_input('Select number of bathrooms', min_value=1, max_value=5, value=1)
 
     if st.sidebar.button('Predict Price'):
-        preprocessed_features = preprocess_input(area, age, floor, num_rooms, num_bathrooms)
-        predicted_price = predict_price(preprocessed_features)
+        predicted_price = predict_price(area, age, floor, num_rooms, num_bathrooms)
         st.success(f'Predicted Price: ${predicted_price[0]:,.2f}')
 
-        # Visualization 1: Price Distribution
-        fig1, ax1 = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax1)
-        ax1.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
-        ax1.text(predicted_price[0], ax1.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
-        ax1.set_title('Distribution of Actual Prices with Predicted Price')
-        ax1.set_xlabel('Price')
-        ax1.set_ylabel('Frequency')
-        st.pyplot(fig1)
-
-        # Ensure that df10 has all the required columns for transformation
-        missing_cols = set(pipeline.named_transformers_['preprocessor'].feature_names_in_) - set(df10.columns)
-        if missing_cols:
-            st.error(f"The following columns are missing in df10: {missing_cols}")
-        else:
-            preprocessed_df10 = pipeline.transform(df10)
-            df10_preprocessed = pd.DataFrame(preprocessed_df10, columns=['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms'])
-            df10_preprocessed['Price'] = df9['Price']  # Assuming df9 has the target 'Price' column
-
-            df_similar_area = df10_preprocessed[df10_preprocessed['area_scaled'] == preprocessed_features.iloc[0]['area_scaled']]
-            df_similar_area['Predicted Price'] = df_similar_area.apply(
-                lambda row: predict_price(row.values.reshape(1, -1))[0], axis=1
-            )
-
-            # Visualization 2: Comparison with other apartments
-            fig2, ax2 = plt.subplots()
-            sns.scatterplot(data=df_similar_area, x='total_rooms', y='Predicted Price', hue='floor_numeric', palette='viridis', ax=ax2)
-            ax2.set_title(f'Predicted Prices for Apartments with {area} sqft Area')
-            ax2.set_xlabel('Number of Rooms')
-            ax2.set_ylabel('Predicted Price')
-            st.pyplot(fig2)
+        # Visualization
+        fig, ax = plt.subplots()
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax)
+        ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
+        ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
+        st.pyplot(fig)
+        
+        # Feature Importances
+        st.subheader('Feature Importances')
+        feature_importances = best_gb_model.feature_importances_
+        features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
+        importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
+        fig, ax = plt.subplots()
+        sns.barplot(x='Importance', y='Feature', data=importance_df, ax=ax)
+        st.pyplot(fig)
+        
+        # Scatter Plot of Predicted vs Actual Prices
+        st.subheader('Predicted vs Actual Prices')
+        y_pred = best_gb_model.predict(X_test)
+        fig, ax = plt.subplots()
+        sns.scatterplot(x=y_test, y=y_pred, ax=ax)
+        ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
+        ax.set_xlabel('Actual')
+        ax.set_ylabel('Predicted')
+        st.pyplot(fig)
 
 if __name__ == "__main__":
+    pipeline = joblib.load('real_estate_app/preprocessing_pipeline.joblib')
+    model = best_gb_model
     run_ui()
