@@ -6,25 +6,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
 
-# Load datasets
-df10 = pd.read_csv('real_estate_app/df10.csv')
-df9 = pd.read_csv('real_estate_app/df9.csv')
-
-# Step 1: Split the Data into Training and Testing Sets
-X = df10.copy()
-y = df9['Price']  # Target variable
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
-best_gb_model = GradientBoostingRegressor(learning_rate=0.1,
-                                          max_depth=3,
-                                          min_samples_leaf=1,
-                                          min_samples_split=3,
-                                          n_estimators=300)
-
-best_gb_model.fit(X_train, y_train)
-
 # Define custom transformers
 class FloorMapper(BaseEstimator, TransformerMixin):
     def __init__(self):
