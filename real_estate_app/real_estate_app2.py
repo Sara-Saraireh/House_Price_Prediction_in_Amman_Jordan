@@ -96,12 +96,15 @@ def run_ui():
 
         # Visualization
         fig, ax = plt.subplots()
-        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax)
+        sns.histplot(df9['Price'], bins=30, kde=True, ax=ax, color='skyblue')
         ax.axvline(predicted_price[0], color='red', linestyle='dashed', linewidth=2)
         ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
+        ax.set_title('Price Distribution with Predicted Price')
+        ax.set_xlabel('Price')
+        ax.set_ylabel('Frequency')
+        plt.tight_layout()
         st.pyplot(fig)
-        
-    
+
         # Feature Importances
         st.subheader('Feature Importances')
         age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
@@ -112,22 +115,23 @@ def run_ui():
 
         # Plotting with enhancements
         fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x='Importance', y='Feature', data=importance_df, palette='viridis', ax=ax)
+        sns.barplot(x='Importance', y='Feature', data=importance_df, color='skyblue', ax=ax)
         ax.set_title('Feature Importances in House Price Prediction Model')
         ax.set_xlabel('Relative Importance')
         ax.set_ylabel('Feature')
         plt.tight_layout()
         st.pyplot(fig)
 
-        
         # Scatter Plot of Predicted vs Actual Prices
         st.subheader('Predicted vs Actual Prices')
         y_pred = best_gb_model.predict(X_test)
         fig, ax = plt.subplots()
-        sns.scatterplot(x=y_test, y=y_pred, ax=ax)
+        sns.scatterplot(x=y_test, y=y_pred, ax=ax, color='skyblue')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
-        ax.set_xlabel('Actual')
-        ax.set_ylabel('Predicted')
+        ax.set_title('Predicted vs Actual Prices')
+        ax.set_xlabel('Actual Price')
+        ax.set_ylabel('Predicted Price')
+        plt.tight_layout()
         st.pyplot(fig)
 
 if __name__ == "__main__":
