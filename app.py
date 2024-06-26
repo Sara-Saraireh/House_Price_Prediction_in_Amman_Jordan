@@ -26,8 +26,8 @@ class TotalRoomsCalculator(BaseEstimator, TransformerMixin):
         return total_rooms.values.reshape(-1, 1)
 
 # Load the preprocessing pipeline and model
-pipeline = joblib.load('/mnt/data/preprocessing_pipeline.joblib')
-with open('/mnt/data/house_price_model.pkl', 'rb') as f:
+pipeline = joblib.load('preprocessing_pipeline.joblib')
+with open('house_price_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 # Define a function to preprocess input features
