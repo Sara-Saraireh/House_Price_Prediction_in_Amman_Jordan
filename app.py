@@ -5,8 +5,8 @@ import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
-df10= pd.read_csv('/Users/mac/Documents/My Projects/real_estate_app/df10.csv')
-df9= pd.read_csv('/Users/mac/Documents/My Projects/real_estate_app/df9.csv')
+df10= pd.read_csv('df10.csv')
+df9= pd.read_csv('df9.csv')
 
 
 # Step 1: Split the Data into Training and Testing Sets
@@ -102,6 +102,6 @@ def run_ui():
         st.success(f'Predicted Price: ${predict_price[0]:,.2f}')
 
 if __name__ == "__main__":
-    pipeline = joblib.load('/Users/mac/Documents/My Projects/real_estate_app/preprocessing_pipeline.joblib')
-    model = load_model('/Users/mac/Documents/My Projects/real_estate_app/best_gb_model.pkl')
+    pipeline = joblib.load('preprocessing_pipeline.joblib')
+    model = load_model('best_gb_model.pkl')
     run_ui()
