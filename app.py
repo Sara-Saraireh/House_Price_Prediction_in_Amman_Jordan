@@ -1,6 +1,7 @@
 import streamlit as st
 import joblib
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 
 # Define a custom transformer to map floor descriptions to numerical values
 class FloorMapper(BaseEstimator, TransformerMixin):
