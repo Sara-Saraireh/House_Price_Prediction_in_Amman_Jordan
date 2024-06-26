@@ -101,6 +101,7 @@ def run_ui():
         ax.text(predicted_price[0], ax.get_ylim()[1] * 0.9, f'${predicted_price[0]:,.2f}', color='red', ha='center')
         st.pyplot(fig)
         
+    
         # Feature Importances
         st.subheader('Feature Importances')
         age_categories = ['0 - 1', '6 - 9', '1 - 5', '10 - 19', '20 - 40']
@@ -108,9 +109,16 @@ def run_ui():
         features = ['area_scaled'] + age_columns + ['floor_numeric', 'total_rooms']
         feature_importances = best_gb_model.feature_importances_
         importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances})
-        fig, ax = plt.subplots()
-        sns.barplot(x='Importance', y='Feature', data=importance_df, ax=ax)
+
+        # Plotting with enhancements
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x='Importance', y='Feature', data=importance_df, palette='viridis', ax=ax)
+        ax.set_title('Feature Importances in House Price Prediction Model')
+        ax.set_xlabel('Relative Importance')
+        ax.set_ylabel('Feature')
+        plt.tight_layout()
         st.pyplot(fig)
+
         
         # Scatter Plot of Predicted vs Actual Prices
         st.subheader('Predicted vs Actual Prices')
