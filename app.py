@@ -4,9 +4,6 @@ import pandas as pd
 import pickle
 from sklearn.base import BaseEstimator, TransformerMixin
 
-# Load the preprocessing pipeline
-pipeline = joblib.load('preprocessing_pipeline.joblib')
-    
     # Load the trained model
 model = load_model('house_price_model.pkl')
 
