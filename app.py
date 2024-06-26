@@ -34,7 +34,7 @@ except Exception as e:
     st.error(f"An error occurred while loading the preprocessing pipeline: {e}")
 
 try:
-    model = joblib.load('house_price_model (2).pkl')
+    model = joblib.load('house_price_model.pkl')
 except FileNotFoundError:
     st.error("Model file not found.")
 except Exception as e:
