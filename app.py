@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 
 # Load the trained model
-model = pickle.load(open('https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/b13ca9d6150ac8dfa787dd1de3c8e957a5790aa1/house_price_model.pkl', 'rb'))
+model = pickle.load(open('house_price_model.pkl', 'rb'))
 
 # Title
 st.title('House Price Prediction in Amman, Jordan')
