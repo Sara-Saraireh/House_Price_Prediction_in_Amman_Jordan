@@ -79,7 +79,7 @@ def predict_price(area, age, floor, num_rooms, num_bathrooms):
 
 # Function to display the Streamlit UI
 def run_ui():
-    st.image('https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/1923b0a569d1f39838ed371e56315f8137f869b6/real_estate_app/amman-cityscape-sketch-hand-drawn.jpg', use_column_width=True)
+    st.image('real_estate_app/amman-cityscape-sketch-hand-drawn.jpg', use_column_width=True)
 
     st.title('Real Estate House Price Prediction')
 
