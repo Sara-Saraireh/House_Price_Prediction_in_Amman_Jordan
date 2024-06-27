@@ -81,9 +81,14 @@ def predict_price(area, age, floor, num_rooms, num_bathrooms):
 def run_ui():
     st.image('real_estate_app/amman-cityscape-sketch-hand-drawn.jpg', use_column_width=True)
 
-    st.title('Real Estate House Price Prediction')
+    st.title('Jubeiha Real Estate Price Predictor - Amman, Jordan')
+    st.write("""
+    Welcome to the Jubeiha, Amman - Jordan Real Estate Price Predictor. Use the sidebar to select the details of the apartment 
+    you are interested in. The app will predict the price based on the input features.
+    """)
 
     st.sidebar.header('Input Features')
+    st.sidebar.write("Choose the details of the apartment:")
     area = st.sidebar.slider('Enter area in square feet', min_value=50, max_value=500, value=50)
     age = st.sidebar.selectbox('Select age of the house', ['0 - 1', '1 - 5', '6 - 9', '10 - 19', '20 - 40'])
     floor = st.sidebar.selectbox('Select floor', ['Ground Floor', 'Third Floor', 'Fourth Floor', 'First Floor',
