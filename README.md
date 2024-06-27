@@ -29,8 +29,8 @@ This repository contains a Streamlit app for predicting house prices in Amman, J
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your_username/real_estate_house_price_prediction.git
-    cd real_estate_house_price_prediction
+    git clone https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan.git
+    cd House_Price_Prediction_in_Amman_Jordan
     ```
 
 2. Create and activate a virtual environment:
