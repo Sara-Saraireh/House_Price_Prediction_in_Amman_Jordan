@@ -14,7 +14,7 @@ This repository contains a Streamlit app for predicting house prices in Amman, J
 ## Screenshots
 
 ### Main Interface
-![Main Interface](https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/9dd3d0f079ce4d475df774f792c050e8ad9618a5/app_screenshots/Screenshot%202024-06-27%20at%202.57.29%20AM.png)
+![Main Interface](https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/c7cc398763b1f58d17d5f3ea88304dd7317419c5/app_screenshots/Screenshot%202024-06-27%20at%203.52.27%20AM.png)
 
 ### Price Prediction
 ![Price Prediction](https://github.com/Sara-Saraireh/House_Price_Prediction_in_Amman_Jordan/blob/9dd3d0f079ce4d475df774f792c050e8ad9618a5/app_screenshots/Screenshot%202024-06-27%20at%202.57.53%20AM.png)
